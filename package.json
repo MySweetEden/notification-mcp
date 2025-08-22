@@ -22,7 +22,9 @@
     "prepublishOnly": "npm run clean && npm run build",
     "dxt:build": "npm run build && npx @anthropic-ai/dxt pack",
     "dxt:validate": "npx @anthropic-ai/dxt validate manifest.json",
-    "dxt:clean": "rm -f *.dxt"
+    "dxt:clean": "rm -f *.dxt",
+    "cursor:setup": "chmod +x scripts/setup-cursor.sh && ./scripts/setup-cursor.sh",
+    "cursor:setup:windows": "scripts\\setup-cursor.bat"
   },
   "repository": {
     "type": "git",

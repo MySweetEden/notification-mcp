@@ -377,11 +377,49 @@ ls node_modules/.bin/notification-mcp-server
 
 ##### **4.4.2. Cursor での設定**
 
-**設定ファイルの場所:**
-- macOS: `~/.cursor/mcp_settings.json`
-- Windows: `%APPDATA%\Cursor\User\mcp_settings.json`
+**🚀 自動セットアップ（推奨）**
 
-**1. グローバルインストール版の設定（推奨）**
+プロジェクトをクローンした場合、ワンコマンドでセットアップできます：
+
+```bash
+# macOS/Linux
+npm run cursor:setup
+
+# Windows
+npm run cursor:setup:windows
+```
+
+このコマンドは以下を自動実行します：
+- プロジェクトのビルド
+- 既存設定のバックアップ
+- グローバルCursor設定への追加
+- 設定の確認
+
+**⚙️ 手動設定**
+
+**設定ファイルの場所:**
+- macOS: `~/.cursor/mcp.json`
+- Windows: `%APPDATA%\Cursor\User\mcp.json`
+
+**1. プロジェクト開発者向け（推奨）**
+
+プロジェクト内の `.cursor/mcp.json` を参考に設定：
+
+```json
+{
+  "mcpServers": {
+    "notification-mcp": {
+      "command": "node",
+      "args": ["/path/to/notification-mcp/dist/index.js"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+```
+
+**2. グローバルインストール版の設定**
 ```json
 {
   "mcpServers": {
@@ -395,13 +433,16 @@ ls node_modules/.bin/notification-mcp-server
 }
 ```
 
-**2. ソースビルド版の設定**
+**3. プロジェクト内設定ファイル**
+
+このプロジェクトには `.cursor/mcp.json` が含まれており、プロジェクトを開いた際の設定例として利用できます：
+
 ```json
 {
   "mcpServers": {
     "notification-mcp": {
       "command": "node",
-      "args": ["/Users/username/notification-mcp/dist/index.js"],
+      "args": ["${workspaceFolder}/dist/index.js"],
       "env": {
         "NODE_ENV": "production"
       }
@@ -410,28 +451,33 @@ ls node_modules/.bin/notification-mcp-server
 }
 ```
 
-**3. ローカルインストール版の設定**
-```json
-{
-  "mcpServers": {
-    "notification-mcp": {
-      "command": "node",
-      "args": ["/Users/username/mcp-servers/node_modules/.bin/notification-mcp-server"],
-      "env": {
-        "NODE_ENV": "production"
-      }
-    }
-  }
-}
+**🧪 設定後の確認手順:**
+
+1. **Cursorを再起動**
+2. **新しいチャットを開始**
+3. **テストコマンドを実行:**
+   ```
+   getSoundPath()
+   ```
+   ```
+   playSound()
+   ```
+   ```
+   showNotification("テスト", "Cursor設定完了")
+   ```
+
+**📝 テストスクリプト**
+
+プロジェクト内の `cursor-test.js` を実行すると、詳細なテスト手順が表示されます：
+
+```bash
+node cursor-test.js
 ```
 
-**設定後の確認手順:**
-1. Cursorを再起動
-2. 新しいチャットを開始
-3. 以下のコマンドでテスト:
-   ```
-   getSoundPath() を実行してMCPサーバーの動作を確認してください
-   ```
+**🔧 トラブルシューティング:**
+- MCPツールが認識されない → Cursorを完全に再起動
+- エラーが発生する → `npm run build` を実行
+- 設定を確認 → `cat ~/.cursor/mcp.json`
 
 ##### **4.4.3. VS Code（Continue拡張）での設定**
 
