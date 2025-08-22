@@ -416,36 +416,157 @@ resetSoundPath()  # デフォルトに戻す
       * NPMパッケージでの標準的なMCPサーバー配布
       * 異なるAIアシスタント間でのツール定義の統一
 
-### **7. 将来の拡張予定**
+### **7. トラブルシューティング**
 
-  * **音声ファイルのカスタマイズ**: ユーザー指定の音声ファイル対応
+#### **7.1 よくある問題と解決方法**
+
+##### **音声が再生されない場合**
+```bash
+# 1. 音声ファイルの存在確認
+getSoundPath() # AIに実行を依頼
+
+# 2. 音声ファイルのアクセス権限確認
+# macOS: システム音声ファイルへのアクセス確認
+ls -la /System/Library/Sounds/Glass.aiff
+
+# Windows: システム音声ファイルの確認
+dir "C:\Windows\Media\Windows Notify.wav"
+
+# 3. デフォルト音声に戻す
+resetSoundPath() # AIに実行を依頼
+```
+
+##### **通知が表示されない場合**
+```bash
+# macOS: 通知センターの設定確認
+# システム環境設定 > 通知とフォーカス で Node.js または Terminal の通知許可を確認
+
+# Windows: 通知設定の確認
+# 設定 > システム > 通知とアクション で通知が有効になっているか確認
+
+# 通知テスト実行
+npm run test:notification
+```
+
+##### **MCPサーバーが起動しない場合**
+```bash
+# 1. ビルドファイルの確認
+npm run build
+
+# 2. 依存関係の再インストール
+npm install
+
+# 3. Node.jsバージョンの確認（18.0.0以上が必要）
+node --version
+
+# 4. 詳細なエラーログの確認
+npm start 2>&1 | tee mcp-server.log
+```
+
+##### **AIアシスタントでツールが認識されない場合**
+```bash
+# 1. MCPサーバー設定の確認
+# Cursor: ~/.cursor/mcp_settings.json
+# VS Code: ~/.continue/config.json
+# Claude Desktop: DXTインストール状況
+
+# 2. サーバーの手動起動テスト
+npm start
+
+# 3. 設定ファイルのパス確認
+which notification-mcp-server  # グローバルインストール時
+```
+
+#### **7.2 デバッグ方法**
+
+##### **詳細ログの有効化**
+```bash
+# 環境変数でデバッグログを有効化
+export NODE_ENV=development
+npm start
+```
+
+##### **個別機能のテスト**
+```bash
+# 音声機能のみテスト
+npm run test:sound
+
+# 通知機能のみテスト  
+npm run test:notification
+
+# 全機能テスト（音声・通知あり）
+npm run test:full
+
+# 基本機能テスト（静音）
+npm test
+```
+
+##### **設定ファイルの確認・リセット**
+```bash
+# 設定ファイルの場所
+ls -la ~/.mcp-sound-config.json
+
+# 設定ファイルの内容確認
+cat ~/.mcp-sound-config.json
+
+# 設定ファイルのバックアップ確認
+ls -la ~/.mcp-sound-config.backup.json
+
+# 設定ファイルのリセット（削除して再起動）
+rm ~/.mcp-sound-config.json
+npm start
+```
+
+#### **7.3 システム要件の確認**
+
+##### **対応OS**
+- **macOS**: 10.15 (Catalina) 以上
+- **Windows**: Windows 10 以上
+- **Node.js**: 18.0.0 以上
+
+##### **必要な権限**
+- **macOS**: 通知センターへのアクセス許可
+- **Windows**: 通知システムへのアクセス許可
+- **音声**: システム音声ファイルへの読み取り権限
+
+#### **7.4 サポートとコミュニティ**
+
+問題が解決しない場合は、以下のリソースをご利用ください：
+
+- **GitHub Issues**: [https://github.com/MySweetEden/notification-mcp/issues](https://github.com/MySweetEden/notification-mcp/issues)
+- **バグレポート**: 詳細なエラーログと環境情報を含めてIssueを作成
+- **機能要望**: Enhancement ラベルでIssueを作成
+
+### **8. 将来の拡張予定**
+
+  * **音声ファイルのカスタマイズ**: ユーザー指定の音声ファイル対応 ✅ (実装済み)
   * **通知の詳細設定**: 表示時間、位置等の設定機能
   * **ログ機能**: 通知履歴の記録機能
   * **Linux対応**: Ubuntu等のLinuxディストリビューション対応
 
 -----
 
-### **8. 参考資料・リンク**
+### **9. 参考資料・リンク**
 
-#### **8.1 公式ドキュメント・SDK**
+#### **9.1 公式ドキュメント・SDK**
 - **[Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk?tab=readme-ov-file)**
   - MCPサーバー開発のためのPython公式SDK
   - サーバー実装の基本的なパターンとベストプラクティス
   - ツール定義やエラーハンドリングの参考実装
 
-#### **8.2 パッケージング・配布**
+#### **9.2 パッケージング・配布**
 - **[Anthropic DXT](https://github.com/anthropics/dxt)**
   - DXTパッケージ作成のための公式ツール
   - ワンクリックインストール対応パッケージの作成方法
   - manifest.json の詳細仕様とパッケージング手順
 
-#### **8.3 実装例・参考プロジェクト**
+#### **9.3 実装例・参考プロジェクト**
 - **[Sound Notification MCP](https://github.com/ks0318-p/sound-notification-mcp)**
   - 本プロジェクトと類似の機能を持つ実装例
   - TypeScript/Node.js での音声通知MCPサーバーの実装
   - macOS/Windows対応の実装パターン
 
-#### **8.4 トラブルシューティング時の参考**
+#### **9.4 トラブルシューティング時の参考**
 上記のリンクは以下の場面で特に有用です：
 
 **開発・実装時:**
