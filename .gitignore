@@ -45,5 +45,9 @@ pids
 coverage/
 .nyc_output
 
-# Config files
 .mcp-sound-config.json
+.mcp-sound-config.backup.json
+
+# Package manager lock files (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml

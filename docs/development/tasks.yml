@@ -5,7 +5,7 @@
 - id: "setup-001"
   branch_name: "feature/project-setup"
   depends_on: []
-  status: "todo"
+  status: "done"
   overview: "プロジェクトの基本構造とpackage.jsonの作成"
   description: |
     Node.jsとTypeScriptベースのMCPサーバープロジェクトの基盤を構築する。
@@ -20,7 +20,7 @@
 - id: "setup-002"
   branch_name: "feature/config-system"
   depends_on: ["setup-001"]
-  status: "todo"
+  status: "done"
   overview: "設定管理システムの実装"
   description: |
     ユーザーホームディレクトリに設定ファイルを保存・読み込みする機能を実装する。
@@ -36,7 +36,7 @@
 - id: "sound-001"
   branch_name: "feature/sound-basic"
   depends_on: ["setup-002"]
-  status: "todo"
+  status: "done"
   overview: "基本的な音声再生機能の実装"
   description: |
     OS標準の音声再生コマンドを使用して音声ファイルを再生する機能を実装する。
@@ -51,7 +51,7 @@
 - id: "sound-002"
   branch_name: "feature/sound-path-management"
   depends_on: ["sound-001"]
-  status: "todo"
+  status: "done"
   overview: "音声パス管理機能の実装"
   description: |
     カスタム音声ファイルの設定、取得、リセット機能を実装する。
@@ -67,7 +67,7 @@
 - id: "notification-001"
   branch_name: "feature/desktop-notification"
   depends_on: ["setup-002"]
-  status: "todo"
+  status: "done"
   overview: "デスクトップ通知機能の実装"
   description: |
     node-notifierライブラリを使用してOSネイティブなデスクトップ通知を表示する機能を実装する。
@@ -83,7 +83,7 @@
 - id: "mcp-001"
   branch_name: "feature/mcp-server-core"
   depends_on: ["sound-002", "notification-001"]
-  status: "todo"
+  status: "done"
   overview: "MCPサーバーのコア機能実装"
   description: |
     Model Context Protocolに準拠したサーバーを実装し、5つのツールを定義する。
@@ -98,7 +98,7 @@
 - id: "mcp-002"
   branch_name: "feature/error-handling"
   depends_on: ["mcp-001"]
-  status: "todo"
+  status: "done"
   overview: "エラーハンドリングとログ機能"
   description: |
     MCPサーバー全体の統一されたエラーハンドリングとログ出力機能を実装する。
@@ -114,7 +114,7 @@
 - id: "build-001"
   branch_name: "feature/build-system"
   depends_on: ["mcp-002"]
-  status: "todo"
+  status: "done"
   overview: "ビルドシステムとパッケージング"
   description: |
     TypeScriptコードのコンパイルと配布用パッケージングシステムを構築する。
@@ -130,7 +130,7 @@
 - id: "test-001"
   branch_name: "feature/basic-testing"
   depends_on: ["build-001"]
-  status: "todo"
+  status: "done"
   overview: "基本的なテストと動作確認"
   description: |
     実装した全機能の動作確認とテストを行う。
@@ -141,6 +141,24 @@
     - 音声再生の動作確認（macOS/Windows）
     - デスクトップ通知の動作確認
     - エラーケースの確認
+
+# バグ修正・改善
+- id: "fix-001"
+  branch_name: "feature/notification-fixes-and-testing"
+  depends_on: ["test-001"]
+  status: "done"
+  overview: "通知システム修正とテストフレームワーク改善"
+  description: |
+    通知システムのnode-notifier互換性問題を修正し、テストシステムを改善する。
+    テストの役割分担を明確化し、実際の動作確認を容易にする。
+  deliverables:
+    - node-notifierのインポート方法修正（デフォルトエクスポート対応）
+    - macOS通知システムとの互換性改善
+    - test-quick.js: 高速基本チェック（静音）
+    - test-runner.js: 完全機能テスト（音声・通知あり）
+    - test-notification-debug.js: 通知専用デバッグ
+    - テスト自動終了機能の実装
+    - 詳細なログ・エラー情報の追加
 
 # ドキュメント・配布準備
 - id: "docs-001"

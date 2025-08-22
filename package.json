@@ -14,8 +14,12 @@
     "start": "node dist/index.js",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test-quick.js",
+    "test:full": "node test-runner.js",
+    "test:sound": "node -e \"const {SoundPlayer} = require('./dist/sound.js'); const player = new SoundPlayer(); player.playSound(player.getDefaultSoundPath()).then(console.log).catch(console.error);\"",
+    "test:notification": "node -e \"const {NotificationManager} = require('./dist/notification.js'); const nm = new NotificationManager(); nm.showSimpleNotification('Test', 'テスト通知です').then(console.log).catch(console.error);\"",
+    "test:interactive": "echo 'MCPサーバーを起動します。Ctrl+Cで終了してください。' && npm start",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
