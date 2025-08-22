@@ -2,8 +2,8 @@
   "dxt_version": "0.1",
   "name": "notification-mcp",
   "version": "1.0.1",
-  "display_name": "AI通知サーバー",
-  "description": "AIの処理完了時に音声とデスクトップ通知を提供するMCPサーバー",
+  "display_name": "通知サーバー",
+  "description": "音声とデスクトップ通知機能を提供するMCPサーバー",
   "author": {
     "name": "MySweetEden",
     "url": "https://github.com/MySweetEden/notification-mcp"

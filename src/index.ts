@@ -3,8 +3,8 @@
 /**
  * Notification MCP Server
  * 
- * AI コーディングアシスタント向けサウンド通知MCPサーバー
- * 音声通知とデスクトップ通知を提供します
+ * 音声・デスクトップ通知機能を提供するMCPサーバー
+ * AIアプリケーションでの長時間処理完了時などに通知を送信します
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -23,8 +23,8 @@ import { NotificationManager } from "./notification.js";
 // サーバー情報
 const SERVER_INFO = {
   name: "notification-mcp",
-  version: "1.0.0",
-  description: "AI コーディングアシスタント向けサウンド通知MCPサーバー",
+  version: "1.0.1",
+  description: "音声・デスクトップ通知機能を提供するMCPサーバー",
 };
 
 // サービスインスタンスを作成
