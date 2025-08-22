@@ -45,14 +45,17 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "os": ["darwin", "win32"],
+  "os": [
+    "darwin",
+    "win32"
+  ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.17.4",
     "node-notifier": "^10.0.1"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.3.0",
     "@types/node-notifier": "^8.0.5",
-    "typescript": "^5.0.0"
+    "typescript": "^5.9.2"
   }
 }

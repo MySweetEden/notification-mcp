@@ -45,7 +45,6 @@ pids
 coverage/
 .nyc_output
 
-# Config files (user-specific)
 .mcp-sound-config.json
 .mcp-sound-config.backup.json
 
