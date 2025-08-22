@@ -48,7 +48,7 @@ jobs:
         tag_name: v${{ steps.package-version.outputs.version }}
         release_name: Release v${{ steps.package-version.outputs.version }}
         body: |
-          ## 🎉 notification-mcp v${{ steps.package-version.outputs.version }}
+          ## 🎉 通知サーバー v${{ steps.package-version.outputs.version }}
           
           ### 📦 DXTパッケージ
           Claude Desktop、Windsurf等でのワンクリックインストールに対応しました。
