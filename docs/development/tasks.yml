@@ -164,7 +164,7 @@
 - id: "docs-001"
   branch_name: "feature/documentation"
   depends_on: ["test-001"]
-  status: "todo"
+  status: "done"
   overview: "ドキュメント整備と配布準備"
   description: |
     プロジェクトの配布に向けてドキュメントを整備し、必要なメタデータを追加する。
