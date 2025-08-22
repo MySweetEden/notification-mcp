@@ -1,0 +1,93 @@
+name: Release DXT Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build TypeScript
+      run: npm run build
+      
+    - name: Install DXT CLI
+      run: npm install -g @anthropic-ai/dxt
+      
+    - name: Validate manifest
+      run: npm run dxt:validate
+      
+    - name: Build DXT package
+      run: npm run dxt:build
+      
+    - name: Get package version
+      id: package-version
+      run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.package-version.outputs.version }}
+        release_name: Release v${{ steps.package-version.outputs.version }}
+        body: |
+          ## 🎉 notification-mcp v${{ steps.package-version.outputs.version }}
+          
+          ### 📦 DXTパッケージ
+          Claude Desktop、Windsurf等でのワンクリックインストールに対応しました。
+          
+          ### 🔧 インストール方法
+          1. 下記の `notification-mcp.dxt` ファイルをダウンロード
+          2. Claude Desktop または Windsurf で開く
+          3. インストールダイアログに従って実行
+          
+          ### 🛠 手動インストール
+          ```bash
+          npm install -g notification-mcp-server
+          ```
+          
+          ### 📋 提供ツール
+          - `playSound` - 音声通知再生
+          - `setSoundPath` - カスタム音声設定
+          - `getSoundPath` - 現在の音声設定確認
+          - `resetSoundPath` - デフォルト音声に戻す
+          - `showNotification` - デスクトップ通知表示
+        draft: false
+        prerelease: false
+        
+    - name: Upload DXT Package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./notification-mcp.dxt
+        asset_name: notification-mcp.dxt
+        asset_content_type: application/octet-stream
+        
+    - name: Upload NPM Package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./notification-mcp-${{ steps.package-version.outputs.version }}.tgz
+        asset_name: notification-mcp-${{ steps.package-version.outputs.version }}.tgz
+        asset_content_type: application/gzip

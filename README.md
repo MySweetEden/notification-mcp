@@ -306,7 +306,7 @@ afplay /System/Library/Sounds/Glass.aiff
 
 #### **4.3. DXTパッケージのインストール（Claude Desktop、Windsurf等）**
 
-**⚠️ 注意: DXTパッケージは現在開発中です。現時点では手動インストールをご利用ください。**
+**🎉 DXTパッケージが利用可能になりました！**
 
 1. **DXTファイルのダウンロード**
    ```bash
@@ -314,6 +314,8 @@ afplay /System/Library/Sounds/Glass.aiff
    curl -L -o notification-mcp.dxt \
      https://github.com/MySweetEden/notification-mcp/releases/latest/download/notification-mcp.dxt
    ```
+   
+   または、[リリースページ](https://github.com/MySweetEden/notification-mcp/releases)から直接ダウンロード
 
 2. **ワンクリックインストール**
    - Claude Desktop、Windsurf等の対応AIアプリケーションで`.dxt`ファイルを開く
@@ -323,6 +325,10 @@ afplay /System/Library/Sounds/Glass.aiff
 3. **インストール確認**
    - AIアシスタントを再起動
    - `getSoundPath()` コマンドでMCPツールが利用可能か確認
+
+4. **自動更新**
+   - GitHub Releasesで新バージョンが自動配布されます
+   - CI/CDパイプラインによる品質保証済み
 
 #### **4.4. MCPサーバーとしての手動設定（推奨方法）**
 
@@ -485,14 +491,20 @@ getSoundPath()を呼んで設定状況を確認してください
    # 開発用ビルド
    npm run build
    
+   # DXT manifest の検証
+   npm run dxt:validate
+   
    # DXTパッケージのビルド
-   npx @anthropic-ai/dxt pack
+   npm run dxt:build
    
    # NPMパッケージの作成
    npm pack
    
    # NPMレジストリへの公開（メンテナー用）
    npm publish
+   
+   # DXTファイルのクリーンアップ
+   npm run dxt:clean
    ```
 
 #### **4.7. 設定管理**
