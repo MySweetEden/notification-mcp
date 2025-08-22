@@ -175,3 +175,110 @@
     - トラブルシューティングガイド
     - package.jsonのメタデータ整備
     - ライセンスファイルの追加
+
+# 配布・公開準備
+- id: "release-001"
+  branch_name: "feature/version-management"
+  depends_on: ["docs-001"]
+  status: "todo"
+  overview: "バージョン管理とリリース準備"
+  description: |
+    セマンティックバージョニングの導入とリリースプロセスの確立。
+    CHANGELOGの作成とバージョンアップの自動化を含む。
+  deliverables:
+    - CHANGELOG.mdの作成
+    - セマンティックバージョニングの適用
+    - リリースノートのテンプレート作成
+    - package.jsonのバージョン管理戦略
+    - リリース用npm scriptsの追加
+
+- id: "release-002"
+  branch_name: "feature/npm-package"
+  depends_on: ["release-001"]
+  status: "todo"
+  overview: "NPMパッケージの準備と公開"
+  description: |
+    NPMレジストリでの公開に向けたパッケージの最終調整。
+    .npmignoreの設定とパッケージサイズの最適化を含む。
+  deliverables:
+    - .npmignoreファイルの作成
+    - package.jsonの公開設定確認
+    - パッケージサイズの最適化
+    - 公開前の最終テスト
+    - NPMレジストリへの公開
+
+- id: "release-003"
+  branch_name: "feature/dxt-package"
+  depends_on: ["release-001"]
+  status: "todo"
+  overview: "DXTパッケージの作成"
+  description: |
+    Claude Desktop、Windsurf等でのワンクリックインストール用DXTパッケージを作成する。
+    manifest.jsonの設定とDXTビルドプロセスの確立を含む。
+  deliverables:
+    - DXT manifest.jsonの作成
+    - アイコンファイルの準備
+    - DXTパッケージのビルド設定
+    - DXTパッケージの動作確認
+    - DXTファイルの生成
+
+- id: "release-004"
+  branch_name: "feature/github-release"
+  depends_on: ["release-002", "release-003"]
+  status: "todo"
+  overview: "GitHubリリースとアセット配布"
+  description: |
+    GitHubでの正式リリースとバイナリ配布の準備。
+    リリースページの作成とダウンロード可能なアセットの提供を含む。
+  deliverables:
+    - GitHubリリースページの作成
+    - リリースアセットの準備（DXTファイル、ソースコード）
+    - リリースノートの作成
+    - タグの作成とプッシュ
+    - リリース自動化の検討
+
+- id: "release-005"
+  branch_name: "feature/distribution-testing"
+  depends_on: ["release-004"]
+  status: "todo"
+  overview: "配布パッケージの統合テスト"
+  description: |
+    各配布形式（NPM、DXT、ソース）での実際のインストールと動作確認。
+    異なる環境での動作検証と問題の洗い出しを含む。
+  deliverables:
+    - NPMパッケージのインストールテスト
+    - DXTパッケージのインストールテスト
+    - 複数OS環境での動作確認
+    - AIアシスタント連携テスト（Cursor、Claude Desktop等）
+    - 問題発見時の修正とリリース更新
+
+# 運用・保守準備
+- id: "maintenance-001"
+  branch_name: "feature/ci-cd"
+  depends_on: ["release-005"]
+  status: "todo"
+  overview: "CI/CDパイプラインの構築"
+  description: |
+    GitHub Actionsを使用した自動テスト・ビルド・デプロイパイプラインの構築。
+    コード品質の自動チェックとリリース自動化を含む。
+  deliverables:
+    - GitHub Actionsワークフローの作成
+    - 自動テスト実行の設定
+    - 自動ビルドとパッケージング
+    - リリース時の自動デプロイ
+    - コード品質チェック（ESLint、Prettier）
+
+- id: "maintenance-002"
+  branch_name: "feature/monitoring"
+  depends_on: ["maintenance-001"]
+  status: "todo"
+  overview: "監視とフィードバック収集"
+  description: |
+    使用状況の監視とユーザーフィードバック収集システムの構築。
+    イシューテンプレートとコミュニティガイドラインの整備を含む。
+  deliverables:
+    - GitHubイシューテンプレートの作成
+    - プルリクエストテンプレートの作成
+    - CONTRIBUTING.mdの作成
+    - コードオブコンダクトの追加
+    - セキュリティポリシーの策定
