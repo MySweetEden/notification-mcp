@@ -1,7 +1,7 @@
 {
   "name": "notification-mcp",
   "version": "1.0.1",
-  "description": "音声・デスクトップ通知機能を提供するMCPサーバー",
+  "description": "音声通知とデスクトップ通知機能を提供するMCPサーバー",
   "main": "dist/index.js",
   "bin": {
     "notification-mcp-server": "dist/index.js"

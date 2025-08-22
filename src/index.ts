@@ -3,7 +3,7 @@
 /**
  * Notification MCP Server
  * 
- * 音声・デスクトップ通知機能を提供するMCPサーバー
+ * 音声通知とデスクトップ通知機能を提供するMCPサーバー
  * AIアプリケーションでの長時間処理完了時などに通知を送信します
  */
 
@@ -24,7 +24,7 @@ import { NotificationManager } from "./notification.js";
 const SERVER_INFO = {
   name: "notification-mcp",
   version: "1.0.1",
-  description: "音声・デスクトップ通知機能を提供するMCPサーバー",
+  description: "音声通知とデスクトップ通知機能を提供するMCPサーバー",
 };
 
 // サービスインスタンスを作成

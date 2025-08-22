@@ -3,7 +3,7 @@
   "name": "notification-mcp",
   "version": "1.0.1",
   "display_name": "通知サーバー",
-  "description": "音声とデスクトップ通知機能を提供するMCPサーバー",
+  "description": "音声通知とデスクトップ通知機能を提供するMCPサーバー",
   "author": {
     "name": "MySweetEden",
     "url": "https://github.com/MySweetEden/notification-mcp"
