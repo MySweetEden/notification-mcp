@@ -9,21 +9,6 @@
     "url": "https://github.com/MySweetEden/notification-mcp"
   },
   "license": "MIT",
-  "homepage": "https://github.com/MySweetEden/notification-mcp",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MySweetEden/notification-mcp.git"
-  },
-  "keywords": [
-    "mcp",
-    "model-context-protocol", 
-    "notification",
-    "sound",
-    "ai-assistant",
-    "claude",
-    "cursor",
-    "vscode"
-  ],
   "server": {
     "type": "node",
     "entry_point": "dist/index.js",
@@ -34,43 +19,5 @@
         "NODE_ENV": "production"
       }
     }
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "os": [
-    "darwin",
-    "win32"
-  ],
-  "files": [
-    "dist/",
-    "package.json",
-    "README.md",
-    "LICENSE"
-  ],
-  "mcp": {
-    "tools": [
-      {
-        "name": "playSound",
-        "description": "設定済みの音声ファイルを再生"
-      },
-      {
-        "name": "setSoundPath", 
-        "description": "通知音の音声ファイルパスを設定"
-      },
-      {
-        "name": "getSoundPath",
-        "description": "現在の音声ファイルパスを取得"
-      },
-      {
-        "name": "resetSoundPath",
-        "description": "音声設定をデフォルトに戻す"
-      },
-      {
-        "name": "showNotification",
-        "description": "デスクトップ通知を表示"
-      }
-    ]
-  },
-  "icon": "icon.png"
+  }
 }
