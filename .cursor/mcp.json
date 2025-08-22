@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "notification-mcp": {
+      "command": "node",
+      "args": ["${workspaceFolder}/dist/index.js"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
