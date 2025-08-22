@@ -205,6 +205,22 @@
     - tasks.yml への新タスク追加
     - 依存関係の整理
     - タスクステータスの更新
+
+# Cursor統合機能強化
+- id: "cursor-001"
+  branch_name: "feature/cursor-integration"
+  depends_on: ["dxt-001"]
+  status: "todo"
+  overview: "Cursor統合機能の強化と.cursorディレクトリ設定"
+  description: |
+    Cursorでの使用体験を向上させるため、プロジェクト内に.cursorディレクトリを作成し、
+    開発者が簡単にMCPサーバーをセットアップできる環境を整備する。
+  deliverables:
+    - .cursor/mcp.json の作成（プロジェクト内設定）
+    - Cursor用セットアップスクリプトの実装
+    - 開発者向けCursor設定ガイドの追加
+    - Cursor環境での動作確認テストの実装
+    - README.mdのCursor設定セクション強化
 # 配布・公開準備
 - id: "release-001"
   branch_name: "feature/version-management"
