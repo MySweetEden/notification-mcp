@@ -1,0 +1,58 @@
+{
+  "name": "notification-mcp",
+  "version": "1.0.0",
+  "description": "AI コーディングアシスタント向けサウンド通知MCPサーバー",
+  "main": "dist/index.js",
+  "bin": {
+    "notification-mcp-server": "dist/index.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "node test-quick.js",
+    "test:full": "node test-runner.js",
+    "test:sound": "node -e \"const {SoundPlayer} = require('./dist/sound.js'); const player = new SoundPlayer(); player.playSound(player.getDefaultSoundPath()).then(console.log).catch(console.error);\"",
+    "test:notification": "node -e \"const {NotificationManager} = require('./dist/notification.js'); const nm = new NotificationManager(); nm.showSimpleNotification('Test', 'テスト通知です').then(console.log).catch(console.error);\"",
+    "test:interactive": "echo 'MCPサーバーを起動します。Ctrl+Cで終了してください。' && npm start",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MySweetEden/notification-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "notification",
+    "sound",
+    "ai-assistant",
+    "claude",
+    "cursor",
+    "vscode"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MySweetEden/notification-mcp/issues"
+  },
+  "homepage": "https://github.com/MySweetEden/notification-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": ["darwin", "win32"],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "node-notifier": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/node-notifier": "^8.0.5",
+    "typescript": "^5.0.0"
+  }
+}
