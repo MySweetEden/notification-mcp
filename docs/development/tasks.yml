@@ -1,0 +1,159 @@
+# notification-mcp プロジェクト タスク管理
+# 主要機能を段階的に実装するためのタスク分解
+
+# プロジェクト基盤セットアップ
+- id: "setup-001"
+  branch_name: "feature/project-setup"
+  depends_on: []
+  status: "todo"
+  overview: "プロジェクトの基本構造とpackage.jsonの作成"
+  description: |
+    Node.jsとTypeScriptベースのMCPサーバープロジェクトの基盤を構築する。
+    必要な依存パッケージのインストールと開発環境の整備を行う。
+  deliverables:
+    - Node.jsプロジェクトの初期化（npm init）
+    - TypeScript設定ファイル（tsconfig.json）の作成
+    - 基本的なディレクトリ構造の作成（src/, dist/, docs/）
+    - 依存パッケージのインストール（@modelcontextprotocol/sdk, node-notifier）
+    - 開発用依存パッケージのインストール（typescript, @types/node）
+
+- id: "setup-002"
+  branch_name: "feature/config-system"
+  depends_on: ["setup-001"]
+  status: "todo"
+  overview: "設定管理システムの実装"
+  description: |
+    ユーザーホームディレクトリに設定ファイルを保存・読み込みする機能を実装する。
+    OS別のデフォルト音声ファイルパスの管理とバックアップ機能を含む。
+  deliverables:
+    - 設定ファイル構造の定義（ConfigInterface）
+    - ホームディレクトリへの設定ファイル読み書き機能
+    - デフォルト設定の初期化処理
+    - OS別のデフォルト音声パス設定（macOS/Windows）
+    - 設定バックアップ機能
+
+# 音声機能の実装
+- id: "sound-001"
+  branch_name: "feature/sound-basic"
+  depends_on: ["setup-002"]
+  status: "todo"
+  overview: "基本的な音声再生機能の実装"
+  description: |
+    OS標準の音声再生コマンドを使用して音声ファイルを再生する機能を実装する。
+    macOSとWindows両方に対応し、非同期実行とエラーハンドリングを含む。
+  deliverables:
+    - OS判定機能の実装
+    - macOS用音声再生（afplay コマンド）
+    - Windows用音声再生（powershell コマンド）
+    - 音声再生の非同期実行
+    - エラーハンドリング（ファイル存在チェック）
+
+- id: "sound-002"
+  branch_name: "feature/sound-path-management"
+  depends_on: ["sound-001"]
+  status: "todo"
+  overview: "音声パス管理機能の実装"
+  description: |
+    カスタム音声ファイルの設定、取得、リセット機能を実装する。
+    設定変更は即座に設定ファイルに永続化され、ファイル存在確認も行う。
+  deliverables:
+    - カスタム音声ファイルパスの設定機能
+    - 現在の音声パス取得機能
+    - デフォルト音声への リセット機能
+    - 音声ファイルの存在確認とバリデーション
+    - 設定変更の永続化
+
+# 通知機能の実装
+- id: "notification-001"
+  branch_name: "feature/desktop-notification"
+  depends_on: ["setup-002"]
+  status: "todo"
+  overview: "デスクトップ通知機能の実装"
+  description: |
+    node-notifierライブラリを使用してOSネイティブなデスクトップ通知を表示する機能を実装する。
+    タイトルとメッセージのカスタマイズとエラーハンドリングを含む。
+  deliverables:
+    - node-notifierを使用した通知表示
+    - タイトルとメッセージのカスタマイズ
+    - OS別の通知スタイル対応
+    - 通知表示エラーのハンドリング
+    - 通知設定の管理
+
+# MCPサーバー実装
+- id: "mcp-001"
+  branch_name: "feature/mcp-server-core"
+  depends_on: ["sound-002", "notification-001"]
+  status: "todo"
+  overview: "MCPサーバーのコア機能実装"
+  description: |
+    Model Context Protocolに準拠したサーバーを実装し、5つのツールを定義する。
+    各ツールのスキーマ定義とリクエスト・レスポンス処理を含む。
+  deliverables:
+    - MCPサーバーの基本セットアップ
+    - 5つのツールの定義（playSound, setSoundPath, getSoundPath, resetSoundPath, showNotification）
+    - ツールスキーマの実装
+    - リクエスト・レスポンス処理の実装
+    - サーバー起動・停止処理
+
+- id: "mcp-002"
+  branch_name: "feature/error-handling"
+  depends_on: ["mcp-001"]
+  status: "todo"
+  overview: "エラーハンドリングとログ機能"
+  description: |
+    MCPサーバー全体の統一されたエラーハンドリングとログ出力機能を実装する。
+    適切なエラーメッセージの返却とデバッグ用のログ機能を含む。
+  deliverables:
+    - 各ツールのエラーハンドリング実装
+    - 適切なエラーメッセージの返却
+    - ログ出力機能（デバッグ用）
+    - 例外処理の統一
+    - レスポンス形式の統一
+
+# ビルド・パッケージング
+- id: "build-001"
+  branch_name: "feature/build-system"
+  depends_on: ["mcp-002"]
+  status: "todo"
+  overview: "ビルドシステムとパッケージング"
+  description: |
+    TypeScriptコードのコンパイルと配布用パッケージングシステムを構築する。
+    npm scriptsとbin設定により実行可能なMCPサーバーを作成する。
+  deliverables:
+    - TypeScriptコンパイル設定
+    - npm scriptsの定義（build, start, dev）
+    - dist/ディレクトリへのビルド出力
+    - 実行可能ファイルの作成（index.js）
+    - package.jsonのbin設定
+
+# テスト・検証
+- id: "test-001"
+  branch_name: "feature/basic-testing"
+  depends_on: ["build-001"]
+  status: "todo"
+  overview: "基本的なテストと動作確認"
+  description: |
+    実装した全機能の動作確認とテストを行う。
+    各OS環境での音声再生と通知表示の動作を検証する。
+  deliverables:
+    - 各MCPツールの動作テスト
+    - 設定ファイルの読み書きテスト
+    - 音声再生の動作確認（macOS/Windows）
+    - デスクトップ通知の動作確認
+    - エラーケースの確認
+
+# ドキュメント・配布準備
+- id: "docs-001"
+  branch_name: "feature/documentation"
+  depends_on: ["test-001"]
+  status: "todo"
+  overview: "ドキュメント整備と配布準備"
+  description: |
+    プロジェクトの配布に向けてドキュメントを整備し、必要なメタデータを追加する。
+    ユーザー向けのインストールガイドとトラブルシューティング情報を含む。
+  deliverables:
+    - インストール手順の詳細化
+    - 使用例の追加
+    - トラブルシューティングガイド
+    - package.jsonのメタデータ整備
+    - ライセンスファイルの追加
