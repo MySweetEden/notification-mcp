@@ -1,0 +1,57 @@
+{
+  "name": "notification-mcp",
+  "version": "1.0.0",
+  "description": "AI コーディングアシスタント向けサウンド通知MCPサーバー",
+  "main": "dist/index.js",
+  "bin": {
+    "notification-mcp-server": "dist/index.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MySweetEden/notification-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "notification",
+    "sound",
+    "ai-assistant",
+    "claude",
+    "cursor",
+    "vscode"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MySweetEden/notification-mcp/issues"
+  },
+  "homepage": "https://github.com/MySweetEden/notification-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin",
+    "win32"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "node-notifier": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/node-notifier": "^8.0.5",
+    "typescript": "^5.9.2"
+  }
+}
