@@ -175,3 +175,33 @@
     - トラブルシューティングガイド
     - package.jsonのメタデータ整備
     - ライセンスファイルの追加
+
+# DXT配布準備
+- id: "dxt-001"
+  branch_name: "feature/dxt-distribution"
+  depends_on: ["docs-001"]
+  status: "todo"
+  overview: "DXTパッケージ作成と配布準備"
+  description: |
+    Claude Desktop、Windsurf等での ワンクリックインストールを可能にする
+    DXTパッケージを作成し、配布チャネルを整備する。
+  deliverables:
+    - DXT manifest.json の作成
+    - DXTビルドスクリプトの実装
+    - パッケージング自動化
+    - GitHub Releases での DXT 配布
+    - Claude Desktop での動作確認
+
+# タスク管理更新
+- id: "task-update-001" 
+  branch_name: "feature/task-management-update"
+  depends_on: []
+  status: "todo"
+  overview: "タスク管理システムの更新"
+  description: |
+    新しい配布タスク（DXT）の追加に伴い、タスク管理ファイルを更新する。
+    プロジェクトの進捗状況を正確に反映させる。
+  deliverables:
+    - tasks.yml への新タスク追加
+    - 依存関係の整理
+    - タスクステータスの更新
