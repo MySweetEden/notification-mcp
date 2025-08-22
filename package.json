@@ -1,7 +1,7 @@
 {
   "name": "notification-mcp",
-  "version": "1.0.0",
-  "description": "AIコーディングアシスタント向けサウンド通知MCPサーバー - 処理完了時に音声とデスクトップ通知を提供",
+  "version": "1.0.1",
+  "description": "AI コーディングアシスタント向けサウンド通知MCPサーバー",
   "main": "dist/index.js",
   "bin": {
     "notification-mcp-server": "dist/index.js"

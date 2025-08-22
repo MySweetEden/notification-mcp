@@ -69,6 +69,77 @@ AIに以下のように指示することで通知機能を利用できます：
 「resetSoundPath()でデフォルト音に戻してください」
 ```
 
+##### **実践的な使用例とベストプラクティス**
+
+**1. 長時間のコード生成・リファクタリング**
+```
+「大規模なコードリファクタリングを実行してください。
+完了したら playSound() と showNotification("リファクタリング完了", "全ファイルの処理が正常に終了しました") を呼んでください」
+```
+
+**2. データベース操作・マイグレーション**
+```
+「データベースマイグレーションを実行してください。
+成功時: showNotification("マイグレーション成功", "データベーススキーマが更新されました") + playSound()
+失敗時: showNotification("マイグレーション失敗", "エラーログを確認してください")」
+```
+
+**3. テスト実行・CI/CD処理**
+```
+「全テストスイートを実行してください。
+結果に応じて通知を送信：
+- 成功: showNotification("テスト完了", "全テストが正常に通過しました") + playSound()
+- 失敗: showNotification("テスト失敗", "失敗したテスト数: X件")」
+```
+
+**4. ファイル処理・バッチ操作**
+```
+「複数ファイルの一括変換処理を実行してください。
+進捗状況を通知：
+- 開始時: showNotification("処理開始", "ファイル変換を開始します")
+- 完了時: playSound() + showNotification("変換完了", "処理されたファイル数: X件")」
+```
+
+**5. API呼び出し・外部サービス連携**
+```
+「外部APIからデータを取得して処理してください。
+完了時に詳細な結果を通知：
+showNotification("API処理完了", "取得レコード数: X件、処理時間: Y秒") + playSound()」
+```
+
+##### **カスタム音声設定のベストプラクティス**
+
+**推奨音声ファイル:**
+- **ファイル形式**: WAV形式（クロスプラットフォーム対応）
+- **ファイルサイズ**: 1MB以下（高速再生のため）
+- **再生時間**: 1-3秒（短めが理想的）
+
+**macOS用おすすめ音声:**
+```bash
+# システム標準音声の場所
+/System/Library/Sounds/
+  - Glass.aiff (デフォルト)
+  - Ping.aiff (短い通知音)
+  - Pop.aiff (ポップ音)
+  - Purr.aiff (柔らかい音)
+```
+
+**Windows用おすすめ音声:**
+```bash
+# システム標準音声の場所
+C:\Windows\Media\
+  - Windows Notify.wav (デフォルト)
+  - Windows Ding.wav (短い通知音)
+  - Windows Pop.wav (ポップ音)
+```
+
+**カスタム音声の設定例:**
+```
+「カスタム音声を設定します：
+setSoundPath("/Users/username/Music/custom-notification.wav")
+設定後に動作確認: playSound()」
+```
+
 #### **2.3 設定管理システム**
 
 ##### **設定ファイル構造**
@@ -188,7 +259,42 @@ AIに以下のように指示することで通知機能を利用できます：
 
 ### **4. セットアップと使用方法**
 
-#### **4.1. 配布形式と対応環境**
+#### **4.1. 前提条件と事前準備**
+
+##### **システム要件**
+- **Node.js**: バージョン 18.0.0 以上
+- **npm**: Node.js に付属（または yarn）
+- **OS**: macOS 10.15+ または Windows 10+
+- **権限**: 通知表示とシステム音声再生の許可
+
+##### **事前確認**
+```bash
+# Node.jsバージョン確認
+node --version  # v18.0.0以上であることを確認
+
+# npm バージョン確認
+npm --version
+
+# システム音声確認（macOS）
+afplay /System/Library/Sounds/Glass.aiff
+
+# システム音声確認（Windows）
+# PowerShellで実行
+[System.Media.SystemSounds]::Beep.Play()
+```
+
+##### **通知許可設定**
+**macOS:**
+1. システム環境設定 > 通知とフォーカス
+2. ターミナル（またはNode.js）の通知を許可
+3. 「おやすみモード」を無効化（テスト時）
+
+**Windows:**
+1. 設定 > システム > 通知とアクション
+2. 通知の表示を有効化
+3. アプリからの通知を許可
+
+#### **4.2. 配布形式と対応環境**
 
 本MCPサーバーは複数の形式で配布され、様々なAIコーディングアシスタントで利用可能です：
 
@@ -198,42 +304,83 @@ AIに以下のように指示することで通知機能を利用できます：
 - **VS Code (Continue拡張)**: MCPサーバーとしての手動設定
 - **Windsurf**: DXT形式またはMCPサーバー設定
 
-#### **4.2. DXTパッケージのインストール（Claude Desktop、Windsurf等）**
+#### **4.3. DXTパッケージのインストール（Claude Desktop、Windsurf等）**
+
+**⚠️ 注意: DXTパッケージは現在開発中です。現時点では手動インストールをご利用ください。**
 
 1. **DXTファイルのダウンロード**
-   - GitHubリリースページから最新の`.dxt`ファイルをダウンロード
+   ```bash
+   # GitHubリリースページから最新版をダウンロード
+   curl -L -o notification-mcp.dxt \
+     https://github.com/MySweetEden/notification-mcp/releases/latest/download/notification-mcp.dxt
+   ```
 
 2. **ワンクリックインストール**
    - Claude Desktop、Windsurf等の対応AIアプリケーションで`.dxt`ファイルを開く
    - インストールダイアログに従ってインストール実行
+   - 自動的に設定ファイルに追加される
 
-#### **4.3. MCPサーバーとしての手動設定（Cursor、VS Code等）**
+3. **インストール確認**
+   - AIアシスタントを再起動
+   - `getSoundPath()` コマンドでMCPツールが利用可能か確認
 
-##### **4.3.1. パッケージのインストール**
+#### **4.4. MCPサーバーとしての手動設定（推奨方法）**
 
-1. **NPMパッケージのグローバルインストール**
-   ```bash
-   npm install -g notification-mcp-server
-   ```
+##### **4.4.1. パッケージのインストール**
 
-2. **またはソースからのビルド**
-   ```bash
-   git clone https://github.com/[username]/notification-mcp.git
-   cd notification-mcp
-   npm install
-   npm run build
-   ```
+**方法1: NPMパッケージのグローバルインストール（推奨）**
+```bash
+# グローバルインストール
+npm install -g notification-mcp-server
 
-##### **4.3.2. Cursor での設定**
+# インストール確認
+notification-mcp-server --version
+which notification-mcp-server
+```
 
-Cursor の設定ファイル（`~/.cursor/mcp_settings.json`）に以下を追加：
+**方法2: ソースからのビルド（開発者向け）**
+```bash
+# リポジトリクローン
+git clone https://github.com/MySweetEden/notification-mcp.git
+cd notification-mcp
 
+# 依存関係インストール
+npm install
+
+# TypeScriptビルド
+npm run build
+
+# 動作確認
+npm run test
+
+# インストールパス確認
+pwd  # この場所を設定ファイルで使用
+```
+
+**方法3: ローカルインストール**
+```bash
+# プロジェクトディレクトリで実行
+mkdir ~/mcp-servers
+cd ~/mcp-servers
+npm init -y
+npm install notification-mcp-server
+
+# インストール先確認
+ls node_modules/.bin/notification-mcp-server
+```
+
+##### **4.4.2. Cursor での設定**
+
+**設定ファイルの場所:**
+- macOS: `~/.cursor/mcp_settings.json`
+- Windows: `%APPDATA%\Cursor\User\mcp_settings.json`
+
+**1. グローバルインストール版の設定（推奨）**
 ```json
 {
   "mcpServers": {
     "notification-mcp": {
-      "command": "node",
-      "args": ["/path/to/notification-mcp/dist/index.js"],
+      "command": "notification-mcp-server",
       "env": {
         "NODE_ENV": "production"
       }
@@ -242,18 +389,45 @@ Cursor の設定ファイル（`~/.cursor/mcp_settings.json`）に以下を追�
 }
 ```
 
-または、グローバルインストールした場合：
+**2. ソースビルド版の設定**
 ```json
 {
   "mcpServers": {
     "notification-mcp": {
-      "command": "notification-mcp-server"
+      "command": "node",
+      "args": ["/Users/username/notification-mcp/dist/index.js"],
+      "env": {
+        "NODE_ENV": "production"
+      }
     }
   }
 }
 ```
 
-##### **4.3.3. VS Code（Continue拡張）での設定**
+**3. ローカルインストール版の設定**
+```json
+{
+  "mcpServers": {
+    "notification-mcp": {
+      "command": "node",
+      "args": ["/Users/username/mcp-servers/node_modules/.bin/notification-mcp-server"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+```
+
+**設定後の確認手順:**
+1. Cursorを再起動
+2. 新しいチャットを開始
+3. 以下のコマンドでテスト:
+   ```
+   getSoundPath() を実行してMCPサーバーの動作を確認してください
+   ```
+
+##### **4.4.3. VS Code（Continue拡張）での設定**
 
 VS Code の Continue 拡張の設定ファイル（`~/.continue/config.json`）に以下を追加：
 
@@ -273,14 +447,14 @@ VS Code の Continue 拡張の設定ファイル（`~/.continue/config.json`）�
 }
 ```
 
-##### **4.3.4. 設定の確認**
+##### **4.4.4. 設定の確認**
 
 設定後、AIアシスタントを再起動し、以下のコマンドで動作確認：
 ```
 getSoundPath()を呼んで設定状況を確認してください
 ```
 
-#### **4.4. AIアシスタントでの使用方法**
+#### **4.5. AIアシスタントでの使用方法**
 
 インストール後、AIに以下のように指示してください：
 
@@ -293,7 +467,7 @@ getSoundPath()を呼んで設定状況を確認してください
 「完了したらshowNotification("データベース更新が完了しました")を呼んでください」
 ```
 
-#### **4.5. 開発者向け：ソースからのビルド**
+#### **4.6. 開発者向け：ソースからのビルド**
 
 1. **リポジトリのクローン**
    ```bash
@@ -321,7 +495,7 @@ getSoundPath()を呼んで設定状況を確認してください
    npm publish
    ```
 
-#### **4.6. 設定管理**
+#### **4.7. 設定管理**
 
 ##### **設定ファイルの場所**
 - **自動生成**: `~/.mcp-sound-config.json`
