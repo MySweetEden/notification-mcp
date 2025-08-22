@@ -19,7 +19,10 @@
     "test:sound": "node -e \"const {SoundPlayer} = require('./dist/sound.js'); const player = new SoundPlayer(); player.playSound(player.getDefaultSoundPath()).then(console.log).catch(console.error);\"",
     "test:notification": "node -e \"const {NotificationManager} = require('./dist/notification.js'); const nm = new NotificationManager(); nm.showSimpleNotification('Test', 'テスト通知です').then(console.log).catch(console.error);\"",
     "test:interactive": "echo 'MCPサーバーを起動します。Ctrl+Cで終了してください。' && npm start",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build",
+    "dxt:build": "npm run build && npx @anthropic-ai/dxt pack",
+    "dxt:validate": "npx @anthropic-ai/dxt validate manifest.json",
+    "dxt:clean": "rm -f *.dxt"
   },
   "repository": {
     "type": "git",
@@ -54,6 +57,7 @@
     "node-notifier": "^10.0.1"
   },
   "devDependencies": {
+    "@anthropic-ai/dxt": "^0.1.0",
     "@types/node": "^24.3.0",
     "@types/node-notifier": "^8.0.5",
     "typescript": "^5.9.2"

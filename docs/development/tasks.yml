@@ -180,7 +180,7 @@
 - id: "dxt-001"
   branch_name: "feature/dxt-distribution"
   depends_on: ["docs-001"]
-  status: "todo"
+  status: "done"
   overview: "DXTパッケージ作成と配布準備"
   description: |
     Claude Desktop、Windsurf等での ワンクリックインストールを可能にする
