@@ -604,125 +604,128 @@ resetSoundPath()  # デフォルトに戻す
 
 ### **7. トラブルシューティング**
 
-#### **7.1 インストール・セットアップ関連**
+#### **7.1 よくある問題と解決方法**
 
-**Q: `npm install -g notification-mcp-server` でエラーが発生する**
+##### **音声が再生されない場合**
 ```bash
-# 解決方法
-sudo npm install -g notification-mcp-server  # macOS/Linux
-# または
-npm config set prefix ~/.npm-global  # グローバルインストール先変更
-export PATH=~/.npm-global/bin:$PATH
-npm install -g notification-mcp-server
+# 1. 音声ファイルの存在確認
+getSoundPath() # AIに実行を依頼
+
+# 2. 音声ファイルのアクセス権限確認
+# macOS: システム音声ファイルへのアクセス確認
+ls -la /System/Library/Sounds/Glass.aiff
+
+# Windows: システム音声ファイルの確認
+dir "C:\Windows\Media\Windows Notify.wav"
+
+# 3. デフォルト音声に戻す
+resetSoundPath() # AIに実行を依頼
 ```
 
-**Q: TypeScriptビルドエラーが発生する**
+##### **通知が表示されない場合**
 ```bash
-# 解決方法
-npm run clean    # dist/ ディレクトリをクリア
-npm install      # 依存関係を再インストール
-npm run build    # 再ビルド実行
+# macOS: 通知センターの設定確認
+# システム環境設定 > 通知とフォーカス で Node.js または Terminal の通知許可を確認
+
+# Windows: 通知設定の確認
+# 設定 > システム > 通知とアクション で通知が有効になっているか確認
+
+# 通知テスト実行
+npm run test:notification
 ```
 
-**Q: MCPサーバーが認識されない（Cursor/VS Code）**
-- 設定ファイルのパスが正しいか確認
-- `dist/index.js` が存在するか確認
-- Node.jsのバージョンが18.0.0以上か確認
-
-#### **7.2 音声再生関連**
-
-**Q: 音声が再生されない（macOS）**
+##### **MCPサーバーが起動しない場合**
 ```bash
-# 原因確認
-ls -la /System/Library/Sounds/Glass.aiff  # デフォルト音声ファイル存在確認
-afplay /System/Library/Sounds/Glass.aiff  # 手動再生テスト
+# 1. ビルドファイルの確認
+npm run build
 
-# 解決方法
-getSoundPath()  # 現在の設定確認
-resetSoundPath()  # デフォルト設定に戻す
+# 2. 依存関係の再インストール
+npm install
+
+# 3. Node.jsバージョンの確認（18.0.0以上が必要）
+node --version
+
+# 4. 詳細なエラーログの確認
+npm start 2>&1 | tee mcp-server.log
 ```
 
-**Q: 音声が再生されない（Windows）**
-- システム音量がミュートになっていないか確認
-- Windows Media Player が正常に動作するか確認
-- PowerShell実行ポリシーを確認: `Get-ExecutionPolicy`
-
-**Q: カスタム音声ファイルが再生されない**
+##### **AIアシスタントでツールが認識されない場合**
 ```bash
-# ファイル形式確認（対応形式）
-# macOS: .aiff, .wav, .mp3, .m4a
-# Windows: .wav, .mp3
+# 1. MCPサーバー設定の確認
+# Cursor: ~/.cursor/mcp_settings.json
+# VS Code: ~/.continue/config.json
+# Claude Desktop: DXTインストール状況
 
-# ファイルパス確認
-setSoundPath("/full/path/to/soundfile.wav")  # 絶対パス使用
-getSoundPath()  # 設定確認
+# 2. サーバーの手動起動テスト
+npm start
+
+# 3. 設定ファイルのパス確認
+which notification-mcp-server  # グローバルインストール時
 ```
 
-#### **7.3 通知表示関連**
+#### **7.2 デバッグ方法**
 
-**Q: デスクトップ通知が表示されない（macOS）**
-1. システム環境設定 > 通知とフォーカス
-2. ターミナル（またはNode.js）の通知許可を確認
-3. 「おやすみモード」が無効になっているか確認
-
-**Q: 通知が表示されない（Windows）**
-1. 設定 > システム > 通知とアクション
-2. 通知の表示が有効になっているか確認
-3. アプリからの通知が許可されているか確認
-
-**Q: 通知がすぐに消える**
-- これは正常動作です（10秒後に自動消去）
-- より長時間表示したい場合は設定ファイルで調整可能
-
-#### **7.4 設定ファイル関連**
-
-**Q: 設定ファイルが見つからない・破損した**
+##### **詳細ログの有効化**
 ```bash
-# 設定ファイル場所確認
+# 環境変数でデバッグログを有効化
+export NODE_ENV=development
+npm start
+```
+
+##### **個別機能のテスト**
+```bash
+# 音声機能のみテスト
+npm run test:sound
+
+# 通知機能のみテスト  
+npm run test:notification
+
+# 全機能テスト（音声・通知あり）
+npm run test:full
+
+# 基本機能テスト（静音）
+npm test
+```
+
+##### **設定ファイルの確認・リセット**
+```bash
+# 設定ファイルの場所
 ls -la ~/.mcp-sound-config.json
 
-# 設定リセット（ファイル削除後、自動再作成）
+# 設定ファイルの内容確認
+cat ~/.mcp-sound-config.json
+
+# 設定ファイルのバックアップ確認
+ls -la ~/.mcp-sound-config.backup.json
+
+# 設定ファイルのリセット（削除して再起動）
 rm ~/.mcp-sound-config.json
-# 次回MCPツール実行時に自動作成される
+npm start
 ```
 
-**Q: 設定変更が反映されない**
-```bash
-# 設定確認
-getSoundPath()
+#### **7.3 システム要件の確認**
 
-# 強制リセット
-resetSoundPath()
-setSoundPath("/new/path/to/sound.wav")
-```
+##### **対応OS**
+- **macOS**: 10.15 (Catalina) 以上
+- **Windows**: Windows 10 以上
+- **Node.js**: 18.0.0 以上
 
-#### **7.5 AIアシスタント連携関連**
+##### **必要な権限**
+- **macOS**: 通知センターへのアクセス許可
+- **Windows**: 通知システムへのアクセス許可
+- **音声**: システム音声ファイルへの読み取り権限
 
-**Q: AIがMCPツールを認識しない**
-1. MCPサーバーが正常に起動しているか確認
-2. AIアシスタントを再起動
-3. 設定ファイルの構文エラーがないか確認
+#### **7.4 サポートとコミュニティ**
 
-**Q: ツール実行時にエラーが発生**
-```bash
-# デバッグ用テスト実行
-npm run test      # 基本テスト
-npm run test:full # 完全テスト（音声・通知あり）
-```
+問題が解決しない場合は、以下のリソースをご利用ください：
 
-#### **7.6 パフォーマンス・その他**
-
-**Q: 音声再生が遅い**
-- 大きなファイルサイズの音声ファイルを使用している可能性
-- より小さなファイル（1MB以下推奨）に変更
-
-**Q: 複数回通知が表示される**
-- 正常動作です（AIが複数回ツールを呼び出した場合）
-- 必要に応じてAIへの指示を調整
+- **GitHub Issues**: [https://github.com/MySweetEden/notification-mcp/issues](https://github.com/MySweetEden/notification-mcp/issues)
+- **バグレポート**: 詳細なエラーログと環境情報を含めてIssueを作成
+- **機能要望**: Enhancement ラベルでIssueを作成
 
 ### **8. 将来の拡張予定**
 
-  * **音声ファイルのカスタマイズ**: ユーザー指定の音声ファイル対応
+  * **音声ファイルのカスタマイズ**: ユーザー指定の音声ファイル対応 ✅ (実装済み)
   * **通知の詳細設定**: 表示時間、位置等の設定機能
   * **ログ機能**: 通知履歴の記録機能
   * **Linux対応**: Ubuntu等のLinuxディストリビューション対応
