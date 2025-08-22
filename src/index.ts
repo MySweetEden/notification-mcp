@@ -16,12 +16,21 @@ import {
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 
+import { FileConfigManager } from "./config.js";
+import { SoundPlayer } from "./sound.js";
+import { NotificationManager } from "./notification.js";
+
 // サーバー情報
 const SERVER_INFO = {
   name: "notification-mcp",
   version: "1.0.0",
   description: "AI コーディングアシスタント向けサウンド通知MCPサーバー",
 };
+
+// サービスインスタンスを作成
+const configManager = new FileConfigManager();
+const soundPlayer = new SoundPlayer();
+const notificationManager = new NotificationManager();
 
 // MCPサーバーインスタンスを作成
 const server = new Server(SERVER_INFO, {
@@ -105,55 +114,118 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case "playSound":
-        return {
-          content: [
-            {
-              type: "text",
-              text: "音声再生機能は実装中です",
-            },
-          ],
-        };
+      case "playSound": {
+        const config = await configManager.load();
+        let soundPath: string;
 
-      case "setSoundPath":
-        return {
-          content: [
-            {
-              type: "text",
-              text: `音声パス設定機能は実装中です: ${args?.soundPath}`,
-            },
-          ],
-        };
+        if (config.sound.useDefault) {
+          soundPath = configManager.getDefaultSoundPath();
+        } else if (config.sound.customPath) {
+          soundPath = config.sound.customPath;
+        } else {
+          soundPath = configManager.getDefaultSoundPath();
+        }
 
-      case "getSoundPath":
+        const result = await soundPlayer.playSound(soundPath);
         return {
           content: [
             {
               type: "text",
-              text: "音声パス取得機能は実装中です",
+              text: result,
             },
           ],
         };
+      }
 
-      case "resetSoundPath":
-        return {
-          content: [
-            {
-              type: "text",
-              text: "音声パスリセット機能は実装中です",
-            },
-          ],
-        };
+      case "setSoundPath": {
+        const soundPath = args?.soundPath as string;
+        if (!soundPath) {
+          throw new Error("soundPath parameter is required");
+        }
 
-      case "showNotification":
+        // 音声ファイルの存在確認
+        const isValid = await soundPlayer.testSoundFile(soundPath);
+        if (!isValid) {
+          throw new Error(`指定された音声ファイルにアクセスできません: ${soundPath}`);
+        }
+
+        // 設定を更新
+        const config = await configManager.load();
+        config.sound.customPath = soundPath;
+        config.sound.useDefault = false;
+        await configManager.save(config);
+
         return {
           content: [
             {
               type: "text",
-              text: `通知表示機能は実装中です: ${args?.title} - ${args?.message}`,
+              text: `音声ファイルパスを設定しました: ${soundPath}`,
             },
           ],
         };
+      }
+
+      case "getSoundPath": {
+        const config = await configManager.load();
+        let currentPath: string;
+        let pathType: string;
+
+        if (config.sound.useDefault) {
+          currentPath = configManager.getDefaultSoundPath();
+          pathType = "デフォルト";
+        } else if (config.sound.customPath) {
+          currentPath = config.sound.customPath;
+          pathType = "カスタム";
+        } else {
+          currentPath = configManager.getDefaultSoundPath();
+          pathType = "デフォルト（フォールバック）";
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `現在の音声ファイル（${pathType}）: ${currentPath}`,
+            },
+          ],
+        };
+      }
+
+      case "resetSoundPath": {
+        const config = await configManager.load();
+        config.sound.useDefault = true;
+        delete config.sound.customPath;
+        await configManager.save(config);
+
+        const defaultPath = configManager.getDefaultSoundPath();
+        return {
+          content: [
+            {
+              type: "text",
+              text: `音声設定をデフォルトに戻しました: ${defaultPath}`,
+            },
+          ],
+        };
+      }
+
+      case "showNotification": {
+        const title = args?.title as string;
+        const message = args?.message as string;
+
+        if (!title || !message) {
+          throw new Error("title and message parameters are required");
+        }
+
+        const result = await notificationManager.showSimpleNotification(title, message);
+        return {
+          content: [
+            {
+              type: "text",
+              text: result,
+            },
+          ],
+        };
+      }
 
       default:
         throw new McpError(
@@ -162,9 +234,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         );
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     throw new McpError(
       ErrorCode.InternalError,
-      `Error executing tool ${name}: ${error}`
+      `Error executing tool ${name}: ${errorMessage}`
     );
   }
 });
