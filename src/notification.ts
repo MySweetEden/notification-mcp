@@ -2,7 +2,6 @@
  * デスクトップ通知機能
  * node-notifierライブラリを使用してOSネイティブな通知を表示
  */
-
 import notifier from "node-notifier";
 
 export interface NotificationOptions {
@@ -22,7 +21,7 @@ export class NotificationManager {
         const notificationOptions = {
           title: options.title,
           message: options.message,
-          sound: options.sound ?? false,
+          sound: options.sound ?? false, // デフォルトは音なし（別途音声再生を使用）
           wait: options.wait ?? false,
           timeout: 10, // 10秒後に自動で消える
           // macOS固有の設定
@@ -33,7 +32,7 @@ export class NotificationManager {
           sticky: false, // 自動で消える
           hint: 'int:transient:1', // 一時的な通知として扱う
         };
-
+        
         console.error(`通知送信中: ${options.title} - ${options.message}`);
         
         notifier.notify(
