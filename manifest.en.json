@@ -2,8 +2,8 @@
   "dxt_version": "0.1",
   "name": "notification-mcp",
   "version": "1.0.1",
-  "display_name": "通知サーバー",
-  "description": "音声通知とデスクトップ通知機能を提供するMCPサーバー",
+  "display_name": "Notification Server",
+  "description": "MCP server providing sound and desktop notification functionality",
   "author": {
     "name": "MySweetEden",
     "url": "https://github.com/MySweetEden/notification-mcp"
@@ -17,6 +17,7 @@
       "args": ["${__dirname}/dist/index.js"],
       "env": {
         "NODE_ENV": "production",
+        "MCP_LANG": "en",
         "CLAUDE_DESKTOP": "true"
       }
     }

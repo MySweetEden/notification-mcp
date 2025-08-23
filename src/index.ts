@@ -19,6 +19,7 @@ import {
 import { FileConfigManager } from "./config.js";
 import { SoundPlayer } from "./sound.js";
 import { NotificationManager } from "./notification.js";
+import { t } from "./i18n.js";
 
 // サーバー情報
 const SERVER_INFO = {
@@ -45,7 +46,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "playSound",
-        description: "設定済みの音声ファイルを再生します",
+        description: t("playSound"),
         inputSchema: {
           type: "object",
           properties: {},
@@ -54,13 +55,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "setSoundPath",
-        description: "通知音として使用する音声ファイルのパスを設定します",
+        description: t("setSoundPath"),
         inputSchema: {
           type: "object",
           properties: {
             soundPath: {
               type: "string",
-              description: "音声ファイルの絶対パス",
+              description: t("soundPathDesc"),
             },
           },
           required: ["soundPath"],
@@ -69,7 +70,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "getSoundPath",
-        description: "現在設定されている音声ファイルのパスを取得します",
+        description: t("getSoundPath"),
         inputSchema: {
           type: "object",
           properties: {},
@@ -78,7 +79,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "resetSoundPath",
-        description: "音声設定をOS標準のデフォルト音に戻します",
+        description: t("resetSoundPath"),
         inputSchema: {
           type: "object",
           properties: {},
@@ -87,24 +88,23 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "showNotification",
-        description: "デスクトップ通知を表示します",
+        description: t("showNotification"),
         inputSchema: {
           type: "object",
           properties: {
             title: {
               type: "string",
-              description: "通知のタイトル",
+              description: t("titleDesc"),
             },
             message: {
               type: "string",
-              description: "通知のメッセージ",
+              description: t("messageDesc"),
             },
           },
           required: ["title", "message"],
           additionalProperties: false,
         },
       },
-
     ],
   };
 });
@@ -227,6 +227,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         };
       }
+
+
 
       default:
         throw new McpError(

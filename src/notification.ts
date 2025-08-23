@@ -32,12 +32,11 @@ export class NotificationManager {
       
       console.error(`🔧 AppleScript実行: ${script}`);
       await execAsync(`osascript -e '${script}'`);
-      
       console.error(`✅ AppleScript成功: ${title} - ${message}`);
       return `AppleScript${withSound ? '（音付き）' : ''}で通知を表示しました: ${title} - ${message}`;
-    } catch (error) {
-      console.error(`❌ AppleScript失敗: ${error}`);
-      throw new Error(`AppleScript通知エラー: ${error}`);
+    } catch (error: any) {
+      console.error(`❌ AppleScript失敗: ${error.message || error}`);
+      throw new Error(`AppleScript通知エラー: ${error.message || error}`);
     }
   }
 
@@ -46,9 +45,22 @@ export class NotificationManager {
    */
   private async showNotificationWithTerminalNotifier(title: string, message: string): Promise<string> {
     try {
-      // ターミナルのBundle IDを指定して確実に許可を得る
       console.error(`🔧 terminal-notifier実行中: ${title} - ${message}`);
-      await execAsync(`terminal-notifier -message "${message.replace(/"/g, '\\"')}" -title "${title.replace(/"/g, '\\"')}" -sender com.apple.Terminal -timeout 10`);
+      
+      // Claude Desktop環境かどうかを判定
+      const isClaude = process.env.CLAUDE_DESKTOP || process.env.npm_lifecycle_event?.includes('claude');
+      
+      let command: string;
+      if (isClaude) {
+        // Claude Desktop用のBundle ID（正しいBundle ID）
+        command = `terminal-notifier -message "${message.replace(/"/g, '\\"')}" -title "${title.replace(/"/g, '\\"')}" -sender com.anthropic.claudefordesktop -timeout 10 -activate com.anthropic.claudefordesktop`;
+      } else {
+        // 通常のターミナル用
+        command = `terminal-notifier -message "${message.replace(/"/g, '\\"')}" -title "${title.replace(/"/g, '\\"')}" -sender com.apple.Terminal -timeout 10`;
+      }
+      
+      console.error(`🔧 実行コマンド: ${command}`);
+      await execAsync(command);
       console.error(`✅ terminal-notifier成功: ${title} - ${message}`);
       return `terminal-notifierで通知を表示しました: ${title} - ${message}`;
     } catch (error) {
@@ -57,35 +69,7 @@ export class NotificationManager {
     }
   }
 
-  /**
-   * より直接的なAppleScript実行（Cursor専用）
-   */
-  private async showNotificationForCursor(title: string, message: string): Promise<string> {
-    try {
-      // 元の動作していた標準的なAppleScriptを使用
-      const script = `display notification "${message.replace(/"/g, '\\"')}" with title "${title.replace(/"/g, '\\"')}" sound name "Glass"`;
-      console.error(`🔧 Cursor用AppleScript実行: ${script}`);
-      
-      const { stdout, stderr } = await execAsync(`osascript -e '${script}'`);
-      console.error(`AppleScript stdout: ${stdout}`);
-      console.error(`AppleScript stderr: ${stderr}`);
-      
-      console.error(`✅ Cursor用AppleScript成功: ${title} - ${message}`);
-      return `Cursor専用AppleScript（音付き）で通知を表示しました: ${title} - ${message}`;
-    } catch (error) {
-      console.error(`❌ Cursor用AppleScript失敗: ${error}`);
-      
-      // 音なしで再試行
-      try {
-        const simpleScript = `display notification "${message.replace(/"/g, '\\"')}" with title "${title.replace(/"/g, '\\"')}"`;
-        console.error(`🔧 シンプルAppleScript実行: ${simpleScript}`);
-        await execAsync(`osascript -e '${simpleScript}'`);
-        return `シンプルAppleScriptで通知を表示しました: ${title} - ${message}`;
-      } catch (simpleError) {
-        throw new Error(`全てのAppleScript方法が失敗: ${error} | ${simpleError}`);
-      }
-    }
-  }
+
 
 
 
@@ -95,70 +79,76 @@ export class NotificationManager {
   async showNotification(options: NotificationOptions): Promise<string> {
     const { title, message } = options;
     console.error(`📱 通知送信開始: ${title} - ${message}`);
-    console.error(`🔧 実行環境: ${process.platform}, Node.js: ${process.version}`);
 
-    // macOSの場合、確実に動作する順序で試行
+    // Claude Desktop環境かどうかを判定
+    const isClaude = process.env.CLAUDE_DESKTOP === 'true';
+
+    // macOSの場合、環境に応じて最適な順序で試行
     if (os.platform() === 'darwin') {
       
-      // 方法1: terminal-notifier（最も確実）
-      try {
-        const result = await this.showNotificationWithTerminalNotifier(title, message);
-        console.error(`✅ terminal-notifier成功: ${result}`);
-        return result;
-      } catch (error) {
-        console.error(`⚠️ terminal-notifier失敗:`, error);
+      if (isClaude) {
+        // Claude Desktop環境: AppleScriptを最優先
+        try {
+          const result = await this.showNotificationWithAppleScript(title, message, true);
+          console.error(`✅ AppleScript成功: ${result}`);
+          return result;
+        } catch (error: any) {
+          console.error(`⚠️ AppleScript失敗:`, error.message || error);
+        }
+
+        // 方法2: terminal-notifier（フォールバック）
+        try {
+          const result = await this.showNotificationWithTerminalNotifier(title, message);
+          console.error(`✅ terminal-notifier成功: ${result}`);
+          return result;
+        } catch (error: any) {
+          console.error(`⚠️ terminal-notifier失敗:`, error.message || error);
+        }
+      } else {
+        // 通常環境（Cursor等）: terminal-notifierを最優先
+        try {
+          const result = await this.showNotificationWithTerminalNotifier(title, message);
+          console.error(`✅ terminal-notifier成功: ${result}`);
+          return result;
+        } catch (error: any) {
+          console.error(`⚠️ terminal-notifier失敗:`, error.message || error);
+        }
+
+        // フォールバック: AppleScript
+        try {
+          const result = await this.showNotificationWithAppleScript(title, message, true);
+          console.error(`✅ AppleScript成功: ${result}`);
+          return result;
+        } catch (error: any) {
+          console.error(`⚠️ AppleScript失敗:`, error.message || error);
+        }
       }
 
-      // 方法2: 標準AppleScript（音付き）- 元の動作していた方法
+      // 共通フォールバック: node-notifier（最後の手段）
       try {
-        const result = await this.showNotificationWithAppleScript(title, message, true);
-        console.error(`✅ AppleScript（音付き）成功: ${result}`);
+        const result = await this.showNotificationWithNodeNotifier(title, message);
+        console.error(`✅ node-notifier成功: ${result}`);
         return result;
       } catch (error) {
-        console.error(`⚠️ AppleScript（音付き）失敗:`, error);
-      }
-
-      // 方法3: 標準AppleScript（音なし）
-      try {
-        const result = await this.showNotificationWithAppleScript(title, message, false);
-        console.error(`✅ AppleScript（音なし）成功: ${result}`);
-        return result;
-      } catch (error) {
-        console.error(`⚠️ AppleScript（音なし）失敗:`, error);
-      }
-
-      // 方法4: Cursor環境専用のAppleScript（実験的）
-      try {
-        const result = await this.showNotificationForCursor(title, message);
-        console.error(`✅ Cursor専用通知成功: ${result}`);
-        return result;
-      } catch (error) {
-        console.error(`⚠️ Cursor専用通知失敗:`, error);
+        console.error(`⚠️ node-notifier失敗:`, error);
       }
     }
 
-    // 方法5: node-notifier（全OS対応フォールバック）
-    try {
-      const result = await this.showNotificationWithNodeNotifier(options);
-      console.error(`✅ node-notifier成功: ${result}`);
-      return result;
-    } catch (error) {
-      console.error(`❌ node-notifier失敗:`, error);
-      throw new Error(`全ての通知方法が失敗しました。以下を確認してください:\n1. システム環境設定で通知許可\n2. Cursorアプリの通知許可\n3. macOSの再起動`);
-    }
+    // 全プラットフォーム共通: 全ての方法が失敗した場合のエラー
+    throw new Error(`全ての通知方法が失敗しました。以下を確認してください:\n1. システム環境設定で通知許可\n2. アプリケーションの通知許可\n3. OSの再起動`);
   }
 
   /**
    * node-notifierによる通知表示
    */
-  private async showNotificationWithNodeNotifier(options: NotificationOptions): Promise<string> {
+  private async showNotificationWithNodeNotifier(title: string, message: string): Promise<string> {
     return new Promise((resolve, reject) => {
       // シンプルな設定で確実性を重視
       const notificationOptions = {
-        title: options.title,
-        message: options.message,
-        sound: options.sound ?? false,
-        wait: options.wait ?? false,
+        title: title,
+        message: message,
+        sound: false,
+        wait: false,
         timeout: 15, // より長めのタイムアウト
         // 問題を起こす可能性のある設定を削除
         // subtitle: undefined,
@@ -168,7 +158,7 @@ export class NotificationManager {
         // hint: undefined,
       };
       
-      console.error(`node-notifier実行中: ${options.title} - ${options.message}`);
+      console.error(`node-notifier実行中: ${title} - ${message}`);
       
       notifier.notify(
         notificationOptions,
@@ -178,7 +168,7 @@ export class NotificationManager {
             reject(new Error(`node-notifier通知失敗: ${error.message}`));
           } else {
             console.error(`node-notifierレスポンス:`, response);
-            resolve(`node-notifierで通知を表示しました: ${options.title} - ${options.message}`);
+            resolve(`node-notifierで通知を表示しました: ${title} - ${message}`);
           }
         }
       );
@@ -296,7 +286,7 @@ export class NotificationManager {
 
     // node-notifierテスト
     try {
-      await this.showNotificationWithNodeNotifier({ title: testTitle, message: testMessage });
+      await this.showNotificationWithNodeNotifier(testTitle, testMessage);
       results.push("✅ node-notifier: 成功");
     } catch (error) {
       results.push(`❌ node-notifier: 失敗 - ${error}`);

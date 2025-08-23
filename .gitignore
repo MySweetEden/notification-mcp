@@ -54,3 +54,7 @@ pnpm-lock.yaml
 
 # DXT packages
 *.dxt
+
+# Temporary backup files
+*.bak
+manifest.json.bak
