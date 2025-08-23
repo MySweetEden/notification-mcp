@@ -17,6 +17,21 @@ The server supports multiple distribution formats, allowing users to choose the 
 
 -----
 
+## ⚠️ **Important: Environment-Specific Limitations**
+
+### Claude Desktop (DXT Package)
+- **🔊 Sound Notifications**: ✅ Fully functional
+- **📱 Desktop Notifications**: ❌ Not available due to technical limitations
+- **Recommended**: Use sound notifications (`playSound()`)
+
+### Cursor・VSCode・Terminal Environments
+- **🔊 Sound Notifications**: ✅ Fully functional  
+- **📱 Desktop Notifications**: ✅ Fully functional
+
+> **💡 Tip**: In Claude Desktop, use `playSound()` instead of `showNotification()` for reliable notifications.
+
+-----
+
 ## **2. Features**
 
 ### **2.1 MCP Tools**

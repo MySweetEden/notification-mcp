@@ -3,7 +3,7 @@
   "name": "notification-mcp",
   "version": "1.0.1",
   "display_name": "Notification Server",
-  "description": "MCP server providing sound and desktop notification functionality",
+  "description": "MCP server providing sound and desktop notification functionality (sound notifications only in Claude Desktop)",
   "author": {
     "name": "MySweetEden",
     "url": "https://github.com/MySweetEden/notification-mcp"

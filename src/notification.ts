@@ -6,6 +6,7 @@ import notifier from "node-notifier";
 import * as os from "os";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { t } from './i18n';
 
 const execAsync = promisify(exec);
 
@@ -82,6 +83,11 @@ export class NotificationManager {
 
     // Claude Desktop環境かどうかを判定
     const isClaude = process.env.CLAUDE_DESKTOP === 'true';
+    
+    // Claude Desktop環境での制限警告
+    if (isClaude) {
+      console.error(`⚠️ ${t('claudeDesktopWarning')}`);
+    }
 
     // macOSの場合、環境に応じて最適な順序で試行
     if (os.platform() === 'darwin') {
@@ -135,7 +141,11 @@ export class NotificationManager {
     }
 
     // 全プラットフォーム共通: 全ての方法が失敗した場合のエラー
-    throw new Error(`全ての通知方法が失敗しました。以下を確認してください:\n1. システム環境設定で通知許可\n2. アプリケーションの通知許可\n3. OSの再起動`);
+    if (isClaude) {
+      throw new Error(t('claudeDesktopError'));
+    } else {
+      throw new Error(`全ての通知方法が失敗しました。以下を確認してください:\n1. システム環境設定で通知許可\n2. アプリケーションの通知許可\n3. OSの再起動`);
+    }
   }
 
   /**
