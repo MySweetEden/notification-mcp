@@ -18,14 +18,25 @@ export interface NotificationOptions {
 
 export class NotificationManager {
   /**
-   * macOS用AppleScriptによる通知表示（フォールバック）
+   * macOS用AppleScriptによる通知表示（確実版）
    */
-  private async showNotificationWithAppleScript(title: string, message: string): Promise<string> {
+  private async showNotificationWithAppleScript(title: string, message: string, withSound: boolean = true): Promise<string> {
     try {
-      const script = `display notification "${message.replace(/"/g, '\\"')}" with title "${title.replace(/"/g, '\\"')}"`;
+      // エスケープ処理を強化
+      const escapedTitle = title.replace(/['"\\]/g, '\\$&');
+      const escapedMessage = message.replace(/['"\\]/g, '\\$&');
+      
+      // 音付きまたは音なしで通知表示
+      const soundPart = withSound ? ' sound name "Glass"' : '';
+      const script = `display notification "${escapedMessage}" with title "${escapedTitle}"${soundPart}`;
+      
+      console.error(`🔧 AppleScript実行: ${script}`);
       await execAsync(`osascript -e '${script}'`);
-      return `AppleScriptで通知を表示しました: ${title} - ${message}`;
+      
+      console.error(`✅ AppleScript成功: ${title} - ${message}`);
+      return `AppleScript${withSound ? '（音付き）' : ''}で通知を表示しました: ${title} - ${message}`;
     } catch (error) {
+      console.error(`❌ AppleScript失敗: ${error}`);
       throw new Error(`AppleScript通知エラー: ${error}`);
     }
   }
@@ -36,22 +47,59 @@ export class NotificationManager {
   private async showNotificationWithTerminalNotifier(title: string, message: string): Promise<string> {
     try {
       // ターミナルのBundle IDを指定して確実に許可を得る
+      console.error(`🔧 terminal-notifier実行中: ${title} - ${message}`);
       await execAsync(`terminal-notifier -message "${message.replace(/"/g, '\\"')}" -title "${title.replace(/"/g, '\\"')}" -sender com.apple.Terminal -timeout 10`);
+      console.error(`✅ terminal-notifier成功: ${title} - ${message}`);
       return `terminal-notifierで通知を表示しました: ${title} - ${message}`;
     } catch (error) {
+      console.error(`❌ terminal-notifier失敗: ${error}`);
       throw new Error(`terminal-notifier通知エラー: ${error}`);
     }
   }
 
   /**
-   * デスクトップ通知を表示（複数手法でフォールバック）
+   * より直接的なAppleScript実行（Cursor専用）
+   */
+  private async showNotificationForCursor(title: string, message: string): Promise<string> {
+    try {
+      // 元の動作していた標準的なAppleScriptを使用
+      const script = `display notification "${message.replace(/"/g, '\\"')}" with title "${title.replace(/"/g, '\\"')}" sound name "Glass"`;
+      console.error(`🔧 Cursor用AppleScript実行: ${script}`);
+      
+      const { stdout, stderr } = await execAsync(`osascript -e '${script}'`);
+      console.error(`AppleScript stdout: ${stdout}`);
+      console.error(`AppleScript stderr: ${stderr}`);
+      
+      console.error(`✅ Cursor用AppleScript成功: ${title} - ${message}`);
+      return `Cursor専用AppleScript（音付き）で通知を表示しました: ${title} - ${message}`;
+    } catch (error) {
+      console.error(`❌ Cursor用AppleScript失敗: ${error}`);
+      
+      // 音なしで再試行
+      try {
+        const simpleScript = `display notification "${message.replace(/"/g, '\\"')}" with title "${title.replace(/"/g, '\\"')}"`;
+        console.error(`🔧 シンプルAppleScript実行: ${simpleScript}`);
+        await execAsync(`osascript -e '${simpleScript}'`);
+        return `シンプルAppleScriptで通知を表示しました: ${title} - ${message}`;
+      } catch (simpleError) {
+        throw new Error(`全てのAppleScript方法が失敗: ${error} | ${simpleError}`);
+      }
+    }
+  }
+
+
+
+  /**
+   * デスクトップ通知を表示（改良版フォールバック）
    */
   async showNotification(options: NotificationOptions): Promise<string> {
     const { title, message } = options;
-    console.error(`通知送信開始: ${title} - ${message}`);
+    console.error(`📱 通知送信開始: ${title} - ${message}`);
+    console.error(`🔧 実行環境: ${process.platform}, Node.js: ${process.version}`);
 
-    // macOSの場合、複数の方法を試行
+    // macOSの場合、確実に動作する順序で試行
     if (os.platform() === 'darwin') {
+      
       // 方法1: terminal-notifier（最も確実）
       try {
         const result = await this.showNotificationWithTerminalNotifier(title, message);
@@ -61,22 +109,42 @@ export class NotificationManager {
         console.error(`⚠️ terminal-notifier失敗:`, error);
       }
 
-      // 方法2: AppleScript（フォールバック）
+      // 方法2: 標準AppleScript（音付き）- 元の動作していた方法
       try {
-        const result = await this.showNotificationWithAppleScript(title, message);
-        console.error(`✅ AppleScript成功: ${result}`);
+        const result = await this.showNotificationWithAppleScript(title, message, true);
+        console.error(`✅ AppleScript（音付き）成功: ${result}`);
         return result;
       } catch (error) {
-        console.error(`⚠️ AppleScript失敗:`, error);
+        console.error(`⚠️ AppleScript（音付き）失敗:`, error);
+      }
+
+      // 方法3: 標準AppleScript（音なし）
+      try {
+        const result = await this.showNotificationWithAppleScript(title, message, false);
+        console.error(`✅ AppleScript（音なし）成功: ${result}`);
+        return result;
+      } catch (error) {
+        console.error(`⚠️ AppleScript（音なし）失敗:`, error);
+      }
+
+      // 方法4: Cursor環境専用のAppleScript（実験的）
+      try {
+        const result = await this.showNotificationForCursor(title, message);
+        console.error(`✅ Cursor専用通知成功: ${result}`);
+        return result;
+      } catch (error) {
+        console.error(`⚠️ Cursor専用通知失敗:`, error);
       }
     }
 
-    // 方法3: node-notifier（最終フォールバック）
+    // 方法5: node-notifier（全OS対応フォールバック）
     try {
-      return await this.showNotificationWithNodeNotifier(options);
+      const result = await this.showNotificationWithNodeNotifier(options);
+      console.error(`✅ node-notifier成功: ${result}`);
+      return result;
     } catch (error) {
-      console.error(`⚠️ node-notifier失敗:`, error);
-      throw new Error(`全ての通知方法が失敗しました。システム設定を確認してください。`);
+      console.error(`❌ node-notifier失敗:`, error);
+      throw new Error(`全ての通知方法が失敗しました。以下を確認してください:\n1. システム環境設定で通知許可\n2. Cursorアプリの通知許可\n3. macOSの再起動`);
     }
   }
 
@@ -219,7 +287,7 @@ export class NotificationManager {
 
       // AppleScriptテスト
       try {
-        await this.showNotificationWithAppleScript(testTitle, testMessage);
+        await this.showNotificationWithAppleScript(testTitle, testMessage, true);
         results.push("✅ AppleScript: 成功");
       } catch (error) {
         results.push(`❌ AppleScript: 失敗 - ${error}`);
@@ -266,4 +334,6 @@ export class NotificationManager {
       message,
     });
   }
+
+
 }

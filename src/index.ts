@@ -104,6 +104,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           additionalProperties: false,
         },
       },
+
     ],
   };
 });
