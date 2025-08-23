@@ -18,6 +18,8 @@
     "test:full": "node test-runner.js",
     "test:sound": "node -e \"const {SoundPlayer} = require('./dist/sound.js'); const player = new SoundPlayer(); player.playSound(player.getDefaultSoundPath()).then(console.log).catch(console.error);\"",
     "test:notification": "node -e \"const {NotificationManager} = require('./dist/notification.js'); const nm = new NotificationManager(); nm.showSimpleNotification('Test', 'テスト通知です').then(console.log).catch(console.error);\"",
+    "test:notification:diagnosis": "node test-notification-diagnosis.js",
+    "test:notification:permission": "node -e \"const {NotificationManager} = require('./dist/notification.js'); const nm = new NotificationManager(); nm.requestNotificationPermission().then(console.log).catch(console.error);\"",
     "test:interactive": "echo 'MCPサーバーを起動します。Ctrl+Cで終了してください。' && npm start",
     "prepublishOnly": "npm run clean && npm run build",
     "dxt:build": "npm run build && npx @anthropic-ai/dxt pack",
